@@ -1,1 +1,15 @@
-spring.application.name=catalog-service
+spring:
+  application:
+    name: catalog-service
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/catalog_service
+server:
+  port: 9001
+  tomcat:
+    connection-timeout: 2s
+    keep-alive-timeout: 15s
+    threads:
+      max: 50
+      min-spare: 5
