@@ -1,10 +1,18 @@
 spring:
   application:
     name: catalog-service
+
   datasource:
     username: root
     password: root
     url: jdbc:mysql://localhost:3306/catalog_service
+
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8888
+
 server:
   port: 9001
   tomcat:
@@ -13,3 +21,13 @@ server:
     threads:
       max: 50
       min-spare: 5
+
+
+bookshop:
+  greeting: "Welcome to bookshop local!"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
