@@ -3,15 +3,25 @@ spring:
     name: catalog-service
 
   datasource:
-    username: root
-    password: root
-    url: jdbc:mysql://localhost:3306/catalog_service
+    username: user
+    password: password
+    url: jdbc:postgresql://localhost:5433/bookshopdb_catalog
+
+    hikari:
+      connection-timeout: 2000
+      maximum-pool-size: 5
+
 
   config:
     import: "optional:configserver:"
+
   cloud:
     config:
       uri: http://localhost:8888
+
+  sql:
+    init:
+      mode: always
 
 server:
   port: 9001

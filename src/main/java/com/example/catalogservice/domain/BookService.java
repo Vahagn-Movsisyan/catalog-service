@@ -1,20 +1,53 @@
 package com.example.catalogservice.domain;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
-public interface BookService {
+import java.util.Date;
 
-    Page<Book> findAll(int index);
+@Service
+@RequiredArgsConstructor
+public class BookService {
 
-    Book findByIsbn(String isbn);
+    private final BookRepository bookRepository;
 
-    Book save(Book book);
+    public Page<Book> getAllBooks() {
+        return bookRepository.findAll(PageRequest.of(0, 10).withSort(Sort.by("createdDate")));
+    }
 
-    Book updateById(long bookId, Book book);
+    public Book findById(long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(String.valueOf(id)));
+    }
 
-    Book findById(long bookId);
+    public Book findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+    }
 
-    boolean existsByIsbn(String isbn);
+    public Book addBookToCatalog(Book book) {
+        book.setCreatedDate(new Date().toInstant());
+        book.setLastModifiedDate(new Date().toInstant());
+        book.setVersion(1);
+        return bookRepository.save(book);
+    }
 
-    void deleteById(long id);
+    public void removeBookFromCatalog(long id) {
+        bookRepository.deleteById(id);
+    }
+
+    public Book editBookDetails(long id, Book book) {
+        return bookRepository.findById(id)
+                .map(existingBook -> {
+                    existingBook.setTitle(book.getTitle());
+                    existingBook.setAuthor(book.getAuthor());
+                    existingBook.setPrice(book.getPrice());
+                    existingBook.setPublisher(book.getPublisher());
+                    return bookRepository.save(existingBook);
+                })
+                .orElseThrow(() -> new BookNotFoundException(String.valueOf(id)));
+    }
 }

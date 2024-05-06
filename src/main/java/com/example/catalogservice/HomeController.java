@@ -1,4 +1,4 @@
-package com.example.catalogservice.web;
+package com.example.catalogservice;
 
 import com.example.catalogservice.config.BookShopProperties;
 import lombok.RequiredArgsConstructor;
