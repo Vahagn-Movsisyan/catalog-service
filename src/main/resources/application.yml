@@ -34,7 +34,7 @@ server:
 
 
 bookshop:
-  greeting: "Welcome to bookshop local!"
+  greeting: "Welcome to the bookshop catalog local!"
 
 management:
   endpoints:

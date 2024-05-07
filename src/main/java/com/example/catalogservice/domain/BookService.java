@@ -1,5 +1,6 @@
 package com.example.catalogservice.domain;
 
+import com.example.catalogservice.util.GenerateIsbnUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ public class BookService {
     }
 
     public Book addBookToCatalog(Book book) {
+        book.setIsbn(GenerateIsbnUtil.generateUUID());
         book.setCreatedDate(new Date().toInstant());
         book.setLastModifiedDate(new Date().toInstant());
         book.setVersion(1);
@@ -42,6 +44,7 @@ public class BookService {
     public Book editBookDetails(long id, Book book) {
         return bookRepository.findById(id)
                 .map(existingBook -> {
+                    existingBook.setIsbn(book.getIsbn());
                     existingBook.setTitle(book.getTitle());
                     existingBook.setAuthor(book.getAuthor());
                     existingBook.setPrice(book.getPrice());

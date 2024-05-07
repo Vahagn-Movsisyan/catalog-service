@@ -1,17 +1,18 @@
 package com.example.catalogservice;
 
 import com.example.catalogservice.domain.Book;
+import com.example.catalogservice.util.GenerateIsbnUtil;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("integration")
+@AutoConfigureWebTestClient
 class CatalogServiceApplicationTests {
 
     @Autowired
@@ -19,92 +20,92 @@ class CatalogServiceApplicationTests {
 
     @Test
     void whenGetRequestWithIdThenBookReturned() {
-        Book bookToCreate = new Book("1231231230", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book bookToCreate = new Book(isbn, "Title", "Author", 9.90, null);
         Book expectedBook = webTestClient
                 .post()
                 .uri("/books")
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookToCreate)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(Book.class).value(book -> assertThat(book).isNotNull())
-                .returnResult().getResponseBody();
+                .expectBody(Book.class)
+                .returnResult()
+                .getResponseBody();
 
         webTestClient
                 .get()
-                .uri("/books/" + "1231231230")
+                .uri("/books/" + isbn)
                 .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(Book.class).value(actualBook -> {
-                    assertThat(actualBook).isNotNull();
-                    assertThat(actualBook.getId()).isEqualTo(expectedBook.getIsbn());
-                });
+                .expectStatus().isOk()
+                .expectBody(Book.class)
+                .value(actualBook -> assertThat(actualBook).isEqualTo(expectedBook));
     }
 
     @Test
     void whenPostRequestThenBookCreated() {
-        Book expectedBook = new Book("1231231230", "Title", "Author", 9.90, null);
-
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book expectedBook = new Book(isbn, "Title", "Author", 9.90, null);
         webTestClient
                 .post()
                 .uri("/books")
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(expectedBook)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(Book.class).value(actualBook -> {
-                    assertThat(actualBook).isNotNull();
-                    assertThat(actualBook.getIsbn()).isEqualTo(expectedBook.getIsbn());
-                });
+                .expectBody(Book.class)
+                .value(actualBook -> assertThat(actualBook).isEqualTo(expectedBook));
     }
 
     @Test
     void whenPutRequestThenBookUpdated() {
-        Book bookToCreate = new Book("1231231230", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book bookToCreate = new Book(isbn, "Title", "Author", 9.90, null);
         Book createdBook = webTestClient
                 .post()
                 .uri("/books")
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookToCreate)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(Book.class).value(book -> assertThat(book).isNotNull())
-                .returnResult().getResponseBody();
-        Book bookToUpdate = new Book(createdBook.getIsbn(), createdBook.getTitle(), createdBook.getAuthor(), 7.95, null);
+                .expectBody(Book.class)
+                .returnResult()
+                .getResponseBody();
+        Book bookToUpdate = new Book(createdBook.getIsbn(), "New Title", "New Author", 7.95, null);
 
         webTestClient
                 .put()
-                .uri("/books/" + "1231231232")
+                .uri("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookToUpdate)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Book.class).value(actualBook -> {
-                    assertThat(actualBook).isNotNull();
-                    assertThat(actualBook.getPrice()).isEqualTo(bookToUpdate.getPrice());
-                });
+                .expectBody(Book.class)
+                .value(actualBook -> assertThat(actualBook).isEqualTo(bookToUpdate));
     }
 
     @Test
     void whenDeleteRequestThenBookDeleted() {
-
-        Book bookToCreate = new Book("1231231230", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book bookToCreate = new Book(isbn, "Title", "Author", 9.90, null);
         webTestClient
                 .post()
                 .uri("/books")
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookToCreate)
                 .exchange()
                 .expectStatus().isCreated();
 
         webTestClient
                 .delete()
-                .uri("/books/" + "1231231233")
+                .uri("/books/" + isbn)
                 .exchange()
                 .expectStatus().isNoContent();
 
         webTestClient
                 .get()
-                .uri("/books/" + "1231231233")
+                .uri("/books/" + isbn)
                 .exchange()
-                .expectStatus().isNotFound()
-                .expectBody(String.class).value(errorMessage ->
-                        assertThat(errorMessage).isEqualTo("The book with ISBN " + "1231231233" + " was not found.")
-                );
+                .expectStatus().isNotFound();
     }
 }

@@ -17,8 +17,8 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public Page<Book> getAll() {
-        return bookService.getAllBooks();
+    public ResponseEntity<Page<Book>> getAll() {
+        return ResponseEntity.ok(bookService.getAllBooks());
     }
 
     @GetMapping("/{id}")
@@ -31,12 +31,14 @@ public class BookController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Book> post(@Valid @RequestBody Book book) {
         if (book != null) {
-            return ResponseEntity.ok(bookService.addBookToCatalog(book));
+            Book createdBook = bookService.addBookToCatalog(book);
+            if (createdBook != null) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+            }
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().build();
     }
 
     @PutMapping("/{id}")

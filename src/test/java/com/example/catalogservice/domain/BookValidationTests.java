@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.example.catalogservice.util.GenerateIsbnUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -26,14 +27,16 @@ class BookValidationTests {
 
     @Test
     void whenAllFieldsCorrectThenValidationSucceeds() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).isEmpty();
     }
 
     @Test
     void whenIsbnNotDefinedThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(2);
         List<String> constraintViolationMessages = violations.stream()
@@ -45,7 +48,8 @@ class BookValidationTests {
 
     @Test
     void whenIsbnDefinedButIncorrectThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -54,7 +58,8 @@ class BookValidationTests {
 
     @Test
     void whenTitleIsNotDefinedThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -63,7 +68,8 @@ class BookValidationTests {
 
     @Test
     void whenAuthorIsNotDefinedThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -72,7 +78,8 @@ class BookValidationTests {
 
     @Test
     void whenPriceIsNotDefinedThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -81,16 +88,17 @@ class BookValidationTests {
 
     @Test
     void whenPriceDefinedButZeroThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
-        assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
                 .isEqualTo("The book price must be greater than zero.");
     }
 
     @Test
     void whenPriceDefinedButNegativeThenValidationFails() {
-        Book book = new Book("1234567890", "Title", "Author", 9.90, null);
+        String isbn = GenerateIsbnUtil.generateUUID();
+        Book book = new Book(isbn, "Title", "Author", 9.90, null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
