@@ -8,6 +8,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -21,9 +22,9 @@ public class BookDataLoader {
     public void loadBookTestData() {
         bookRepository.deleteAll();
         Book book1 = new Book( "1234567891", "Northern Lights",
-                "Lyra Silverstar", 9.90, null, null, null, 0);
+                "Lyra Silverstar", 9.90, null, new Date().toInstant(), new Date().toInstant(), 0);
         Book book2 = new Book( "1234567892", "Polar Journey",
-                "Iorek Polarson", 12.90, null, null, null, 0);
+                "Iorek Polarson", 12.90, null, new Date().toInstant(), new Date().toInstant(), 0);
         bookRepository.saveAll(List.of(book1, book2));
     }
 }

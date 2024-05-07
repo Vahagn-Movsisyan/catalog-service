@@ -9,4 +9,3 @@ CREATE TABLE book(
     last_modified_date timestamp             NOT NULL,
     version            integer               NOT NULL
 );
-
