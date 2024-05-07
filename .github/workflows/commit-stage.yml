@@ -38,6 +38,7 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
+
       - name: Validate Kubernetes manifests
         uses: stefanprodan/kube-tools@v1
         with:
