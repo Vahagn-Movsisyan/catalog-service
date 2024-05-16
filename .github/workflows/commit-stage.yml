@@ -32,7 +32,7 @@ jobs:
         with:
           path: "${{ github.workspace }}"
           fail-build: false
-          severity-cutoff: hig
+          severity-cutoff: high
 
   package:
     name: Package and Publish
